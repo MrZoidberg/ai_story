@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PublishAot>true</PublishAot>
+		<PublishTrimmed>true</PublishTrimmed>
+		<StripSymbols>true</StripSymbols>
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<IlcGenerateCompleteTypeMetadata>true</IlcGenerateCompleteTypeMetadata>
+		<IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AIStory.StoryGenerationLambda\src\AIStory.StoryGenerationLambda\AIStory.StoryGenerationLambda.csproj" />
+		<ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="OpenAI" Version="1.7.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--The runtime directives file allows the compiler to know what types and assemblies to not trim out of the final binary, even if they don't appear to be used.-->
+		<RdXmlFile Include="rd.xml" />
+	</ItemGroup>
+</Project>
