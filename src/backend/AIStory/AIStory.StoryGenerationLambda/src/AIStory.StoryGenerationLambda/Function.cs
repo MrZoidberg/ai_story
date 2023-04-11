@@ -1,9 +1,10 @@
 namespace AIStory.StoryGenerationLambda;
 
+using AIStory.SharedConfiguration;
 using AIStory.SharedModels.Localization;
 using AIStory.StorySendTelegramLambda;
-using AIStory.TelegramBotLambda;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization.SystemTextJson;
@@ -81,6 +82,7 @@ public class Function
                         HttpClientFactory = f.GetRequiredService<IHttpClientFactory>()
                     };
                 });
+                
                 services.AddSingleton< IAmazonDynamoDB>(f => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
                 services.AddSingleton(f => context.Logger);
                 services.AddSingleton<StringResourceFactory>();

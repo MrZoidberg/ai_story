@@ -1,5 +1,6 @@
 namespace AIStory.TelegramBotLambda;
 
+using AIStory.SharedConfiguration;
 using AIStory.SharedModels.Localization;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;

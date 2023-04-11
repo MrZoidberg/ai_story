@@ -31,7 +31,8 @@ public static class StoryExtensions
         {
             { "StoryId", new AttributeValue { S = story.StoryId } },
             { "ProcessingTime", new AttributeValue { N = story.ProcessingTime.TotalSeconds.ToString() } },
-            { "CreatedAt", new AttributeValue { S = story.CreatedAt.ToString(CultureInfo.InvariantCulture) } },
+            // we are using sortable ("s") format specifier to make possible to sort stories by date
+            { "CreatedAt", new AttributeValue { S = story.CreatedAt.ToUniversalTime().ToString("s", CultureInfo.InvariantCulture) } },
             { "Prompt", new AttributeValue { SS = story.Prompt.ToList() } },
             { "ChatId", new AttributeValue { S = story.ChatId } },
             { "Language", new AttributeValue { S = story.Language } },
@@ -65,7 +66,7 @@ public static class StoryExtensions
             StoryId = item["StoryId"].S,
             StoryText = item.ContainsKey("Story") ? item["Story"].M.ToDictionary(k => int.Parse(k.Key), v => v.Value.S) : null,
             ProcessingTime = TimeSpan.FromSeconds(double.Parse(item["ProcessingTime"].N)),
-            CreatedAt = DateTime.Parse(item["CreatedAt"].S, CultureInfo.InvariantCulture),
+            CreatedAt = DateTime.Parse(item["CreatedAt"].S, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal),
             Prompt = item["Prompt"].SS,
             ChatId = item["ChatId"].S,
             Language = item["Language"].S,

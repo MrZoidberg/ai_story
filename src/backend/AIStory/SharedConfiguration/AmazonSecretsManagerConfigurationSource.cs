@@ -1,6 +1,5 @@
-﻿namespace AIStory.TelegramBotLambda;
+﻿namespace AIStory.SharedConfiguration;
 
-using AIStory.SharedConfiguration;
 using Microsoft.Extensions.Configuration;
 
 public class AmazonSecretsManagerConfigurationSource : IConfigurationSource

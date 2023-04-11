@@ -1,4 +1,4 @@
-﻿namespace AIStory.TelegramBotLambda;
+﻿namespace AIStory.SharedConfiguration;
 
 using Microsoft.Extensions.Configuration;
 

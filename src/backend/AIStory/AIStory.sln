@@ -22,6 +22,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIStory.StorySendTelegramLa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedConfiguration", "SharedConfiguration\SharedConfiguration.csproj", "{AFA673BC-50C2-4352-8174-734798DC6F5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIStories.ApiGetStories", "AIStories.ApiGetStories\src\AIStories.ApiGetStories\AIStories.ApiGetStories.csproj", "{454A893F-0BCE-4505-ABE8-DD5758CFB936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{0656C61B-EBD7-4383-AE1C-49C4D38AA944}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Telegram", "Telegram", "{2D4E8DB0-7953-423F-81DE-8A3A94AAC685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,9 +62,18 @@ Global
 		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{454A893F-0BCE-4505-ABE8-DD5758CFB936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{454A893F-0BCE-4505-ABE8-DD5758CFB936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{454A893F-0BCE-4505-ABE8-DD5758CFB936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{454A893F-0BCE-4505-ABE8-DD5758CFB936}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DC0C61CF-FB21-4050-9972-1526EFA63C6D} = {2D4E8DB0-7953-423F-81DE-8A3A94AAC685}
+		{494373B8-63E9-4E8D-8907-07463CC69695} = {2D4E8DB0-7953-423F-81DE-8A3A94AAC685}
+		{454A893F-0BCE-4505-ABE8-DD5758CFB936} = {0656C61B-EBD7-4383-AE1C-49C4D38AA944}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {887B7F84-8FC4-41FC-A082-D7FA412EB5C0}
