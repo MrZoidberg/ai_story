@@ -9,7 +9,7 @@ internal sealed class RuAIRequestGenerator: AIRequestGenerator
     {
         string participantsPart = participantsCount == 1 ? "главным персонажем" : "главными персонажами";
         string audioPart = generateAudio ? " Используй Speech Synthesis Markup Language для расстановки интонации в тексте." : string.Empty;
-        return $"Напиши {{0}} и {{1}} {participantsPart} {{2}}. История должна происходить {{3}} и должна содержать не менее {GetMinLengthFromTokens(model, lengthTokens)} и не более {GetMaxLengthFromTokens(model, lengthTokens)} слов. Обязательно закончи рассказ.{audioPart}";
+        return $"Напиши {{0}} c {{1}} {participantsPart} {{2}}. История должна происходить в месте {{3}} и должна содержать не менее {GetMinLengthFromTokens(model, lengthTokens)} и не более {GetMaxLengthFromTokens(model, lengthTokens)} слов. Обязательно закончи рассказ.{audioPart}";
     }
 
     protected override string GetParticipantsPromptPart(string language, IEnumerable<string> participants)

@@ -16,7 +16,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIStory.TestMessagesGenerat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIStory.StoryGenerationLambda.Tests", "AIStory.StoryGenerationLambda.Tests\AIStory.StoryGenerationLambda.Tests.csproj", "{E680328E-A5BD-4502-B540-8C75A4D4D275}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIStory.TelegramBotLambda", "AIStory.TelegramBotLambda\src\AIStory.TelegramBotLambda\AIStory.TelegramBotLambda.csproj", "{DC0C61CF-FB21-4050-9972-1526EFA63C6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIStory.TelegramBotLambda", "AIStory.TelegramBotLambda\src\AIStory.TelegramBotLambda\AIStory.TelegramBotLambda.csproj", "{DC0C61CF-FB21-4050-9972-1526EFA63C6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIStory.StorySendTelegramLambda", "AIStory.StorySendTelegramLambda\src\AIStory.StorySendTelegramLambda\AIStory.StorySendTelegramLambda.csproj", "{494373B8-63E9-4E8D-8907-07463CC69695}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedConfiguration", "SharedConfiguration\SharedConfiguration.csproj", "{AFA673BC-50C2-4352-8174-734798DC6F5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +48,14 @@ Global
 		{DC0C61CF-FB21-4050-9972-1526EFA63C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC0C61CF-FB21-4050-9972-1526EFA63C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC0C61CF-FB21-4050-9972-1526EFA63C6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{494373B8-63E9-4E8D-8907-07463CC69695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{494373B8-63E9-4E8D-8907-07463CC69695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{494373B8-63E9-4E8D-8907-07463CC69695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{494373B8-63E9-4E8D-8907-07463CC69695}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFA673BC-50C2-4352-8174-734798DC6F5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

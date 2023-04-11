@@ -3,6 +3,11 @@
 		<Assembly Name="bootstrap" Dynamic="Required All"></Assembly>
 		<Assembly Name="Telegram.Bot" Dynamic="Required All"></Assembly>
 		<Assembly Name="AWSSDK.Core" Dynamic="Required All"></Assembly>
+		<Assembly Name="AWSSDK.SQS" Dynamic="Required All"></Assembly>
 		<Assembly Name="AWSSDK.DynamoDBv2" Dynamic="Required All"></Assembly>
+		<Assembly Name="Newtonsoft.Json">
+			<Type Name="Newtonsoft.Json.Serialization.SnakeCaseNamingStrategy" Dynamic="Required All">
+			</Type>
+		</Assembly>		
 	</Application>
 </Directives>

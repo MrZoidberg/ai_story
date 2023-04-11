@@ -1,20 +1,23 @@
 namespace AIStory.TelegramBotLambda;
 
+using AIStory.SharedModels.Localization;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.RuntimeSupport;
-using Amazon.Lambda.Serialization.SystemTextJson;
+using Amazon.SQS;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Zoid.AIStory.SharedModels.Dto;
 
 public class Function
 {
+    private static string EnvName;
+
     /// <summary>
     /// The main entry point for the Lambda function. The main function is called once during the Lambda init phase. It
     /// initializes the .NET Lambda runtime client passing in the function handler to invoke for each Lambda event and
@@ -22,15 +25,15 @@ public class Function
     /// </summary>
     private static async Task Main()
     {
-        Func<Update, ILambdaContext, Task> handler = FunctionHandler;
-        await LambdaBootstrapBuilder.Create(handler, new SourceGeneratorLambdaJsonSerializer<LambdaFunctionJsonSerializerContext>())
+        EnvName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+        Func<Stream, ILambdaContext, Task> handler = FunctionHandler;
+        await LambdaBootstrapBuilder.Create(handler)
             .Build()
             .RunAsync();
     }
 
     /// <summary>
-    /// A simple function that takes a string and does a ToUpper.
-    ///
     /// To use this handler to respond to an AWS event, reference the appropriate package from 
     /// https://github.com/aws/aws-lambda-dotnet#events
     /// and change the string input parameter to the desired event type. When the event type
@@ -47,45 +50,58 @@ public class Function
     /// <param name="input"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    public static async Task FunctionHandler(Update input, ILambdaContext context)
+    public static async Task FunctionHandler(Stream stream, ILambdaContext context)
     {
-        if (!(input.Message is { } message))
+        var builder = new HostBuilder()
+            .ConfigureAppConfiguration((_, configurationBuilder) =>
+            {
+                configurationBuilder
+                .AddAmazonSecretsManager(Amazon.RegionEndpoint.USEast1.SystemName, $"{EnvName}/AIStory/TelegramBotLambda")
+                .AddEnvironmentVariables();
+            })
+         .ConfigureServices((hostContext, services) =>
+         {
+             services.AddHttpClient("telegram_bot_client")
+              .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
+              {
+                  var options = new TelegramBotClientOptions(sp.GetRequiredService<LambdaOptions>().TelegramBotToken);
+                  return new TelegramBotClient(options, httpClient);
+              });
+             services.AddSingleton<IAmazonDynamoDB>(f => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
+             services.AddSingleton(f => context.Logger);
+             services.AddSingleton<ChatMessageHandler>();
+             services.AddSingleton<StringResourceFactory>();
+             services.AddSingleton<Workflow.Workflow>();
+             services.AddSingleton<UserChatRepository>();
+             services.AddSingleton<IAmazonSQS>(f => new AmazonSQSClient(Amazon.RegionEndpoint.USEast1));
+             services.AddSingleton<StoryBuilder>();
+             services.AddSingleton(f => f.GetRequiredService<IOptions<LambdaOptions>>().Value);
+
+             services.Configure<LambdaOptions>(hostContext.Configuration);
+         });
+
+        var host = builder.Build();
+
+        using var streamReader = new StreamReader(stream);
+        var input = await streamReader.ReadToEndAsync();
+        context.Logger.LogInformation($"Received Message:");
+        context.Logger.LogInformation(input);
+
+        var update = Newtonsoft.Json.JsonConvert.DeserializeObject<Update>(input);
+
+        if (update == null)
         {
             return;
         }
 
-        var builder = new HostBuilder()
-           .ConfigureServices((hostContext, services) =>
-           {
-               services.AddHttpClient("telegram_bot_client")
-                .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
-                {
-                    var options = new TelegramBotClientOptions(Environment.GetEnvironmentVariable("Telegram_API_KEY") ?? throw new InvalidOperationException("Cannot find Telegram API Key"));
-                    return new TelegramBotClient(options, httpClient);
-                });
-               services.AddSingleton(f => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
-               services.AddSingleton(f => context.Logger);
-               services.AddSingleton<ChatMessageHandler>();
-               services.AddSingleton<UserChatRepository>();
-           });
-
-        var host = builder.Build();
-
-        context.Logger.LogInformation($"Received Message {input.Id}:");
-        context.Logger.LogInformation(JsonSerializer.Serialize(input, typeof(Update), LambdaFunctionJsonSerializerContext.Default));
-
         var messageHandler = host.Services.GetRequiredService<ChatMessageHandler>();
-        await messageHandler.ProcessMessage(input.Message);
+        await messageHandler.ProcessMessage(update);
     }
 }
 
-/// <summary>
-/// This class is used to register the input event and return type for the FunctionHandler method with the System.Text.Json source generator.
-/// There must be a JsonSerializable attribute for each type used as the input and return type or a runtime error will occur 
-/// from the JSON serializer unable to find the serialization information for unknown types.
-/// </summary>
-[JsonSerializable(typeof(Update))]
-public partial class LambdaFunctionJsonSerializerContext : JsonSerializerContext
+
+[JsonSerializable(typeof(GenerateStoryMessage))]
+public partial class MessageJsonSerializerContext : JsonSerializerContext
 {
     // By using this partial class derived from JsonSerializerContext, we can generate reflection free JSON Serializer code at compile time
     // which can deserialize our class and properties. However, we must attribute this class to tell it what types to generate serialization code for.

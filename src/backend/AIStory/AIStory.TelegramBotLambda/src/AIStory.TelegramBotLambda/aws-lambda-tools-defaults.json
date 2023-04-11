@@ -23,6 +23,6 @@
     "function-subnets"      : "",
     "function-security-groups" : "",
     "tracing-mode"             : "Active",
-    "environment-variables"    : "\"Telegram_API_KEY\"=\"[REDUCTED]\"",
+    "environment-variables"    : "\"ASPNETCORE_ENVIRONMENT\"=\"Development\"",
     "image-tag"                : ""
 }

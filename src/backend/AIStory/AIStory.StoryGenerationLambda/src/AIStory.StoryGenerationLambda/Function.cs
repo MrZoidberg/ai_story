@@ -1,10 +1,14 @@
 namespace AIStory.StoryGenerationLambda;
 
+using AIStory.SharedModels.Localization;
+using AIStory.StorySendTelegramLambda;
+using AIStory.TelegramBotLambda;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization.SystemTextJson;
 using Amazon.Lambda.SQSEvents;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -15,6 +19,8 @@ using Zoid.AIStory.SharedModels.Dto;
 
 public class Function
 {
+    private static string EnvName;
+
     /// <summary>
     /// The main entry point for the Lambda function. The main function is called once during the Lambda init phase. It
     /// initializes the .NET Lambda runtime client passing in the function handler to invoke for each Lambda event and
@@ -22,6 +28,8 @@ public class Function
     /// </summary>
     private static async Task Main()
     {
+        EnvName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
         Func<SQSEvent, ILambdaContext, Task<string>> handler = FunctionHandler;
         await LambdaBootstrapBuilder.Create(handler, new SourceGeneratorLambdaJsonSerializer<LambdaFunctionJsonSerializerContext>())
             .Build()
@@ -50,25 +58,38 @@ public class Function
     public static async Task<string> FunctionHandler(SQSEvent sqsEvent, ILambdaContext context)
     {
         var builder = new HostBuilder()
-        .ConfigureServices((hostContext, services) =>
-        {
-            services.AddHttpClient(Options.DefaultName, client =>
+            .ConfigureAppConfiguration((_, configurationBuilder) =>
             {
-                client.Timeout = context.RemainingTime - TimeSpan.FromSeconds(10);
-            });
-            services.AddSingleton<AIRequestGeneratorFactory>();
-            services.AddSingleton(f =>
+                configurationBuilder
+                .AddAmazonSecretsManager(Amazon.RegionEndpoint.USEast1.SystemName, $"{EnvName}/AIStory/StoryGenerationLambda")
+                .AddEnvironmentVariables();
+            })
+            .ConfigureServices((hostContext, services) =>
             {
-                string? apiKey = Environment.GetEnvironmentVariable("OpenAI_API_KEY") ?? throw new InvalidOperationException("OpenAI_API_KEY environment variable is not set.");
-                return new OpenAIAPI(apiKey)
+                services.AddHttpClient(Options.DefaultName, client =>
                 {
-                    HttpClientFactory = f.GetRequiredService<IHttpClientFactory>()
-                };
+                    // since OpenAI API is slow, we need to give it more time than the default 30 seconds. 
+                    // we'll give it 10 seconds less than the remaining time of the AWS Lambda,
+                    // so that we can still return a response to the user.
+                    client.Timeout = context.RemainingTime - TimeSpan.FromSeconds(10);
+                });
+                services.AddSingleton<AIRequestGeneratorFactory>();
+                services.AddSingleton(f =>
+                {
+                    return new OpenAIAPI(f.GetRequiredService<LambdaOptions>().OpenAIKey)
+                    {
+                        HttpClientFactory = f.GetRequiredService<IHttpClientFactory>()
+                    };
+                });
+                services.AddSingleton< IAmazonDynamoDB>(f => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
+                services.AddSingleton(f => context.Logger);
+                services.AddSingleton<StringResourceFactory>();
+                services.AddSingleton<MessageProcessor>();
+                services.AddSingleton<StoriesRepository>();
+                services.AddSingleton(f => f.GetRequiredService<IOptions<LambdaOptions>>().Value);
+
+                services.Configure<LambdaOptions>(hostContext.Configuration);
             });
-            services.AddSingleton(f => new AmazonDynamoDBClient(Amazon.RegionEndpoint.USEast1));
-            services.AddSingleton(f => context.Logger);
-            services.AddSingleton<MessageProcessor>();
-        });
 
         var host = builder.Build();
 
@@ -76,12 +97,7 @@ public class Function
         context.Logger.LogInformation($"Beginning to process {sqsEvent.Records.Count} records...");
 
         var processor = host.Services.GetRequiredService<MessageProcessor>();
-        var storiesTableName = Environment.GetEnvironmentVariable("StoriesTable");
-        if (storiesTableName != null)
-        {
-            processor.StoriesTable = storiesTableName;
-        }
-
+        
         foreach (var record in sqsEvent.Records)
         {
             context.Logger.LogInformation($"Message ID: {record.MessageId}");

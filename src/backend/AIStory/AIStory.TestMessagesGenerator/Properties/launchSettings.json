@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AIStory.TestMessagesGenerator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AWS_PROFILE": "my-sso"
+      }
+    }
+  }
+}

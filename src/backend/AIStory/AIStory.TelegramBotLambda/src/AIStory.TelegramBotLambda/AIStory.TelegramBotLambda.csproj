@@ -29,10 +29,16 @@
 		<PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.8.6" />
 		<PackageReference Include="Amazon.Lambda.Core" Version="2.1.0" />
 		<PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.3.1" />
-		<PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.102.22" />
+		<PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.102.22" />		
+		<PackageReference Include="AWSSDK.SQS" Version="3.7.100.108" />		
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 		<PackageReference Include="Telegram.Bot" Version="18.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\SharedConfiguration\SharedConfiguration.csproj" />
+	  <ProjectReference Include="..\..\..\SharedModels\SharedModels.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<!--The runtime directives file allows the compiler to know what types and assemblies to not trim out of the final binary, even if they don't appear to be used.-->

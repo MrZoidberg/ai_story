@@ -1,17 +1,16 @@
 ﻿namespace AIStory.StoryGenerationLambda;
 
+using AIStory.SharedModels.Localization;
 using OpenAI_API.Chat;
-using OpenAI_API.Completions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Zoid.AIStory.SharedModels;
 using Zoid.AIStory.SharedModels.Dto;
 
 internal abstract class AIRequestGenerator: IAIRequestGenerator
 {
 
-    public ChatRequest GenerateStoryRequest(GenerateStoryMessage generateStoryMessage)
+    public ChatRequest GenerateStoryRequest(GenerateStoryMessage generateStoryMessage, StringResourceFactory stringResourceFactory)
     {
         var tokensCount = GetTokensCount(generateStoryMessage.Model, generateStoryMessage.StoryLength);
         var promptTemplate = GetPromtTemplate(generateStoryMessage.Language, generateStoryMessage.Model, generateStoryMessage.StoryCharacters.Count(), tokensCount, generateStoryMessage.GenerateAudio);
@@ -21,7 +20,8 @@ internal abstract class AIRequestGenerator: IAIRequestGenerator
         }
 
         var participants = GetParticipantsPromptPart(generateStoryMessage.Language, generateStoryMessage.StoryCharacters);
-        var prompt = string.Format(promptTemplate, generateStoryMessage.StoryTheme, generateStoryMessage.StoryCharacters.Count(), participants, generateStoryMessage.StoryLocation);
+        var storyTheme = stringResourceFactory.StringResources.GetThemeName(generateStoryMessage.StoryTheme).ToLowerInvariant();
+        var prompt = string.Format(promptTemplate, storyTheme, generateStoryMessage.StoryCharacters.Count(), participants, generateStoryMessage.StoryLocation);
 
         var storyRequest = new ChatRequest
         {

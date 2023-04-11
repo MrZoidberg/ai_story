@@ -9,6 +9,10 @@ public class AIRequestGeneratorFactory
         {
             case "ru":
                 return new RuAIRequestGenerator();
+            case "uk":
+                return new UkAIRequestGenerator();
+            case "en":
+                return new EngAIRequestGenerator();
             default:
                 throw new ArgumentException("Language is not supported");
         }

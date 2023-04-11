@@ -1,0 +1,15 @@
+<Directives xmlns="http://schemas.microsoft.com/netfx/2013/01/metadata">
+	<Application>
+		<Assembly Name="bootstrap" Dynamic="Required All"></Assembly>
+		<Assembly Name="AWSSDK.Core" Dynamic="Required All"></Assembly>
+		<Assembly Name="Telegram.Bot" Dynamic="Required All"></Assembly>
+		<Assembly Name="Amazon.Lambda.DynamoDBEvents" Dynamic="Required All"></Assembly>		
+		<Assembly Name="AWSSDK.DynamoDBv2" Dynamic="Required All"></Assembly>
+		<Assembly Name="Newtonsoft.Json">
+			<Type Name="Newtonsoft.Json.Serialization.SnakeCaseNamingStrategy" Dynamic="Required All">
+			</Type>
+		</Assembly>
+		<Assembly Name="Microsoft.Extensions.Hosting"  Dynamic="Required All"></Assembly>
+		<Assembly Name="Microsoft.Extensions.DependencyInjection" Dynamic="Required All"></Assembly>
+	</Application>
+</Directives>

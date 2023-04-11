@@ -1,36 +1,20 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 
-using AIStory.StoryGenerationLambda;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
+//using AIStory.StoryGenerationLambda;
+using AIStory.SharedModels.Localization;
+using AIStory.SharedModels.Models;
+using AIStory.TelegramBotLambda;
+using AIStory.TelegramBotLambda.Helpers;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.Runtime;
+using Amazon.Runtime.CredentialManagement;
 using OpenAI_API;
 using System.Text.Json;
-using Zoid.AIStory.SharedModels;
+using System.Text.Json.Serialization;
 using Zoid.AIStory.SharedModels.Dto;
 
-var builder = new HostBuilder()
-        .ConfigureServices((hostContext, services) =>
-        {
-            services.AddHttpClient(Options.DefaultName, client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(150);
-            });
-            services.AddSingleton<AIRequestGeneratorFactory>();
-            services.AddSingleton(f =>
-            {
-                string? apiKey = Environment.GetEnvironmentVariable("OpenAI_API_KEY") ?? throw new InvalidOperationException("OpenAI_API_KEY environment variable is not set.");
-                return new OpenAIAPI(apiKey)
-                {
-                    HttpClientFactory = f.GetRequiredService<IHttpClientFactory>()
-                };
-            });
-        });
-
-var host = builder.Build();
-
-host.Services.GetRequiredService<IHttpClientFactory>().CreateClient();
 
 var message = new GenerateStoryMessage
 {
@@ -41,13 +25,14 @@ var message = new GenerateStoryMessage
     StoryCharacters = new List<string>(new[] { "Стас", "Филипп" }),
     StoryLength = 200,
     StoryLocation = "в логове врага",
-    StoryTheme = "героический рассказ",
-    UserId = Guid.NewGuid().ToString()
+    StoryTheme = StoryTheme.Fairytale,
+    ChatId = Guid.NewGuid().ToString()
 };
 
 JsonSerializerOptions jso = new JsonSerializerOptions();
 jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-
+jso.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+/*
 string jsonString = JsonSerializer.Serialize(message, jso);
 Console.WriteLine(jsonString);
 
@@ -64,7 +49,37 @@ Console.WriteLine(jsonString);
 
 Console.WriteLine(typeof(System.Collections.ObjectModel.ReadOnlyCollection<>).Assembly.FullName);
 Console.WriteLine(typeof(OpenAI_API.Chat.ChatChoice).Assembly.FullName);
+*/
+Telegram.Bot.Types.Update update = new Telegram.Bot.Types.Update();
+update.Message = new Telegram.Bot.Types.Message()
+{
+    Text = "/start",
+    Chat = new Telegram.Bot.Types.Chat()
+    {
+        Id = 234234,
+        Username = "mihmerk",
+        FirstName = "Mikhail"
+    },
+    From = new Telegram.Bot.Types.User()
+    {
+        Username = "mihmerk",
+        FirstName = "Mikhail",
+        Id = 02346789234789,
+        LanguageCode = "ru"
+    }
+};
+var jsonString = JsonSerializer.Serialize(update, jso);
+Console.WriteLine(jsonString);
 
+
+var storytext = new Dictionary<int, string>();
+storytext.Add(0, "На ферме, где росли огромные тыквы, жил Джек Потрошитель.");
+
+StringResourceFactory stringResourceFactory = new StringResourceFactory();
+stringResourceFactory.Language = "ru";
+var text = string.Format(stringResourceFactory.StringResources.HereIsStoryFormat, string.Join(Environment.NewLine, storytext.Select(x => x.Value)));
+
+var result = StringHelper.SplitWithMultipleSeparators("Коля, Маша и Дима", new[] { ",", " и " });
 
 Console.ReadLine();
 
