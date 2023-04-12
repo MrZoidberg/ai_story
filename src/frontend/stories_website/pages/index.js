@@ -42,7 +42,7 @@ export async function getStaticProps({ locale }) {
   return {
     props: {
       fallback: {
-        '/api/stories': stories
+        '/api/stories?page=0': stories
       }
     },
   }
