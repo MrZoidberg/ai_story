@@ -1,8 +1,8 @@
 ﻿namespace AIStories.ApiGetStories;
 
 using AIStory.SharedModels.Dto;
-using AIStory.SharedModels.Models;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,7 +23,13 @@ internal class StoriesRepository
     /// Gets stories page from DynamoDB using Language-CreatedAt-index index and returns it as StoryShortPage
     /// </summary>
     public async Task<StoryShortPage> GetStoriesPages(string? lastKey, int pageSize, string language)
-    { 
+    {
+        Dictionary<string, AttributeValue>? exclusiveStartKey = null;
+        if (!string.IsNullOrEmpty(lastKey)) {
+            var lastKeyJson = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(lastKey));
+            exclusiveStartKey = Document.FromJson(lastKeyJson).ToAttributeMap();
+        }
+
         var request = new QueryRequest
         {
             TableName = TableName,
@@ -39,10 +45,7 @@ internal class StoriesRepository
             },
             ScanIndexForward = false,
             Limit = pageSize,
-            ExclusiveStartKey = lastKey == null ? null : new Dictionary<string, AttributeValue>
-            {
-                { "StoryId", new AttributeValue { S = lastKey } },
-            },
+            ExclusiveStartKey = exclusiveStartKey,
         };
         var response = await amazonDynamoDB.QueryAsync(request);
         var stories = new List<StoryShortProjection>();
@@ -50,11 +53,18 @@ internal class StoriesRepository
         {
             stories.Add(item.ToStoryShortProjection());
         }
+        
+        string? lastEvaluatedKeyBase64 = null;
+        if (response.LastEvaluatedKey != null)
+        {
+            var json = Document.FromAttributeMap(response.LastEvaluatedKey).ToJson();
+            lastEvaluatedKeyBase64 = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+        }
 
         return new StoryShortPage()
         {
             Stories = stories,
-            LastEvaluatedKey = response.LastEvaluatedKey == null ? null : response.LastEvaluatedKey["StoryId"].S,
+            LastEvaluatedKey = lastEvaluatedKeyBase64,
             HasMore = response.LastEvaluatedKey != null,
             PageSize = pageSize
         };

@@ -26,6 +26,7 @@ internal sealed class EventProcessor
 
     public async Task ProcessEvent(DynamoDBEvent.DynamodbStreamRecord record)
     {
+
         var story = record.Dynamodb.NewImage.ToStory();
         lambdaLogger.LogInformation($"Processing story {story.StoryId} for chat {story.ChatId}");
 

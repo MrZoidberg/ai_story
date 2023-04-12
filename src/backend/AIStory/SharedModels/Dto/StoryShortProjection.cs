@@ -5,6 +5,7 @@ using Amazon.DynamoDBv2.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.Json;
 
 public class StoryShortPage
 {
