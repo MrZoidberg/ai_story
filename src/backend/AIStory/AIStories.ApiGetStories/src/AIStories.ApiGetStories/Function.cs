@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Amazon.Lambda.APIGatewayEvents;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Amazon.Runtime.Internal.Transform;
 
 public class Function
 {
@@ -29,7 +30,7 @@ public class Function
     private static async Task Main()
     {
         EnvName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-        
+
         Func<APIGatewayHttpApiV2ProxyRequest, ILambdaContext, Task<APIGatewayHttpApiV2ProxyResponse>> handler = FunctionHandler;
         await LambdaBootstrapBuilder.Create(handler, new SourceGeneratorLambdaJsonSerializer<LambdaFunctionJsonSerializerContext>())
             .Build()
@@ -122,15 +123,22 @@ public class Function
             {
                 StatusCode = 200,
                 Body = JsonSerializer.Serialize(new GetStoriesResponse(page), jso),
+                Headers = new Dictionary<string, string>
+                {
+                    { "Content-Type", "application/json" },
+                    { "Access-Control-Allow-Headers", "Content-Type"},
+                    { "Access-Control-Allow-Origi", "*"},
+                    { "Access-Control-Allow-Methods", "OPTIONS,GET" }
+                }
             };
         }
-        catch(JsonException ex)
+        catch (JsonException ex)
         {
             context.Logger.LogError(ex.Message);
 
             ProblemDetails problemDetails = new ProblemDetails()
             {
-                Detail = IsDevelopment ? ex.Message + Environment.NewLine + ex.StackTrace : "Cannot parse request",                
+                Detail = IsDevelopment ? ex.Message + Environment.NewLine + ex.StackTrace : "Cannot parse request",
                 Status = 500,
                 Title = "Internal server error"
             };
@@ -141,7 +149,7 @@ public class Function
                 Body = JsonSerializer.Serialize(problemDetails, LambdaFunctionJsonSerializerContext.Default.ProblemDetails),
             };
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             context.Logger.LogError(ex.Message);
 
