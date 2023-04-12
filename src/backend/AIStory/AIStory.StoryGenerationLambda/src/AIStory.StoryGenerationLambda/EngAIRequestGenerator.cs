@@ -18,7 +18,7 @@ internal sealed class EngAIRequestGenerator : AIRequestGenerator
 
     protected override ushort GetTokensCount(string model, ushort lengthCharacters)
     {
-        return (ushort)(lengthCharacters * 3);
+        return (ushort)(lengthCharacters * 5);
     }
 
     private ushort GetMinLengthFromTokens(string model, ushort lengthTokens)
