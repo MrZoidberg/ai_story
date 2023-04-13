@@ -8,14 +8,20 @@ import { storiesFetcher } from '../src/api';
 import { SWRConfig } from 'swr';
 import { unstable_serialize } from "swr/infinite";
 import TelegramIcon from '@mui/icons-material/Telegram';
+import { setLanguage, getLanguage, DEFAULT_LANG } from '../src/langService';
+import { LangSwitcher } from '../components/langSwitcher';
 
 function Home({ fallback }) {
+  const currentLang = getLanguage();
+
   return (
     <Layout home>
       <Head>
         <title>{siteTitle}</title>
       </Head>
-      <MyAppBar />
+      <MyAppBar>
+        <LangSwitcher currentLocale={currentLang} setLocale={setLanguage}/>
+      </MyAppBar>
       <section className={styles.headerSection}>
         <h1 className={styles.title}>
           Welcome to <a href="https://t.me/AIGPTStoriesBot">AI.Stories!</a>
@@ -29,7 +35,7 @@ function Home({ fallback }) {
         </p>
       </section>
       <SWRConfig value={{ fallback }}>
-        <StoriesGrid />
+        <StoriesGrid locale={currentLang}/>
       </SWRConfig>
     </Layout>
   )
@@ -39,8 +45,8 @@ function Home({ fallback }) {
 // This function gets called at build time on server-side.
 // It won't be called on client-side, so you can even do
 // direct database queries.
-export async function getStaticProps({ locale }) {
-  const { url, data } = await storiesFetcher(locale, 10);
+export async function getStaticProps() {
+  const { url, data } = await storiesFetcher(DEFAULT_LANG, 10);
 
   //console.log(`getStaticProps: ${url(0)}`, data);
 

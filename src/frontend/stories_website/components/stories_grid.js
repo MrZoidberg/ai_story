@@ -10,12 +10,11 @@ import { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 // create MUI Grid with up to 2 columns from stories data 
-function StoriesGrid() {
-    const router = useRouter()
-    const { data, isLoading, isValidating, mutate, size, setSize } = useStories(router.locale, PAGE_SIZE);
+function StoriesGrid({locale}) {
+    const { data, isLoading, isValidating, mutate, size, setSize } = useStories(locale, PAGE_SIZE);
     // console.log(`StoriesGrid size: ${size}`);
     // console.log(`isLoading: ${isLoading}`);
     // console.log(`StoriesGrid data:`, data);
