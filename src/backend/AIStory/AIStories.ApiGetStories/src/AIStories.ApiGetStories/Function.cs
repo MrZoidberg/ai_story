@@ -134,7 +134,7 @@ public class Function
         }
         catch (JsonException ex)
         {
-            context.Logger.LogError(ex.Message);
+            context.Logger.LogError("JsonException: " + ex.Message);
 
             ProblemDetails problemDetails = new ProblemDetails()
             {
@@ -148,24 +148,7 @@ public class Function
                 StatusCode = 500,
                 Body = JsonSerializer.Serialize(problemDetails, LambdaFunctionJsonSerializerContext.Default.ProblemDetails),
             };
-        }
-        catch (Exception ex)
-        {
-            context.Logger.LogError(ex.Message);
-
-            ProblemDetails problemDetails = new ProblemDetails()
-            {
-                Detail = IsDevelopment ? ex.Message + Environment.NewLine + ex.StackTrace : "Unknown server error",
-                Status = 500,
-                Title = "Internal server error"
-            };
-
-            return new APIGatewayHttpApiV2ProxyResponse()
-            {
-                StatusCode = 500,
-                Body = JsonSerializer.Serialize(problemDetails, LambdaFunctionJsonSerializerContext.Default.ProblemDetails),
-            };
-        }
+        }        
     }
 }
 
@@ -179,6 +162,7 @@ public class Function
 [JsonSerializable(typeof(GetStoriesRequest))]
 [JsonSerializable(typeof(GetStoriesResponse))]
 [JsonSerializable(typeof(ProblemDetails))]
+[JsonSerializable(typeof(System.Byte))]
 public partial class LambdaFunctionJsonSerializerContext : JsonSerializerContext
 {
     // By using this partial class derived from JsonSerializerContext, we can generate reflection free JSON Serializer code at compile time

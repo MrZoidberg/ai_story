@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "ai-stories",
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",

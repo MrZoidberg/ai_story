@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 internal class LambdaOptions
 {
-    public string? StoriesTableName { get; set; }
+    public string? StoriesTableName { get; set; }    
 }
