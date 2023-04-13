@@ -10,21 +10,25 @@ import { useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 // create MUI Grid with up to 2 columns from stories data 
 function StoriesGrid() {
     const router = useRouter()
     const { data, isLoading, isValidating, mutate, size, setSize } = useStories(router.locale, PAGE_SIZE);
+    // console.log(`StoriesGrid size: ${size}`);
+    // console.log(`isLoading: ${isLoading}`);
+    // console.log(`StoriesGrid data:`, data);
 
-    console.log(`StoriesGrid size: ${size}`);
-    console.log('StoriesGrid data: ', data);
-
-    const stories = data ? [].concat(...data?.["Page"]["Stories"]) : [];
+    const stories = data ? [].concat(Array.isArray(data) ? data.map(p => p["Page"]["Stories"]).flat(1): data["Page"]["Stories"]) : [];
     const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
-    const isEmpty = data?.[0]?.length === 0;
-    const isReachingEnd = isEmpty || (data && !data.Page.HasMore);
-    const isRefreshing = isValidating && data && data.length === size;
+    const isEmpty = stories?.length === 0;
+    const isReachingEnd = isEmpty || (data && Array.isArray(data[size - 1]) && !data[size - 1].Page.HasMore);
+
+    // console.log(`stories:`, stories);
+    // console.log(`isLoadingMore: ${isLoadingMore}`);
+    // console.log(`isEmpty: ${isEmpty}`);
+    // console.log(`isReachingEnd: ${isReachingEnd}`);
 
     return (
         <div className={styles.container}>

@@ -42,10 +42,12 @@ internal class StoriesRepository
             ExpressionAttributeNames = new Dictionary<string, string>
             {
                 { "#Language", "Language" },
+                { "#Story", "Story" },
             },
             ScanIndexForward = false,
             Limit = pageSize,
             ExclusiveStartKey = exclusiveStartKey,
+            FilterExpression = "attribute_exists(#Story)"
         };
         var response = await amazonDynamoDB.QueryAsync(request);
         var stories = new List<StoryShortProjection>();
@@ -55,7 +57,7 @@ internal class StoriesRepository
         }
         
         string? lastEvaluatedKeyBase64 = null;
-        if (response.LastEvaluatedKey != null)
+        if (response.LastEvaluatedKey != null && response.LastEvaluatedKey.Count > 0)
         {
             var json = Document.FromAttributeMap(response.LastEvaluatedKey).ToJson();
             lastEvaluatedKeyBase64 = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
@@ -65,8 +67,8 @@ internal class StoriesRepository
         {
             Stories = stories,
             LastEvaluatedKey = lastEvaluatedKeyBase64,
-            HasMore = response.LastEvaluatedKey != null,
-            PageSize = pageSize
+            HasMore = lastEvaluatedKeyBase64 != null,
+            PageSize = response.Count
         };
     }
 }

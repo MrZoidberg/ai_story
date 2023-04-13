@@ -38,7 +38,7 @@ function Home({fallback}) {
 export async function getStaticProps({ locale }) {  
   const {url, data} = await storiesFetcher(locale, 10);
 
-  console.log(`getStaticProps: ${url(0)}: ${data}`)
+  console.log(`getStaticProps: ${url(0)}`, data);
 
   // By returning { props: { posts } }, the Blog component
   // will receive `posts` as a prop at build time
