@@ -6,6 +6,7 @@ import StoriesGrid from '../components/stories_grid';
 import MyAppBar from '../components/app_bar';
 import { storiesFetcher } from '../src/api';
 import { SWRConfig } from 'swr';
+import { unstable_serialize } from "swr/infinite";
 
 function Home({fallback}) {
   return (
@@ -35,14 +36,16 @@ function Home({fallback}) {
 // It won't be called on client-side, so you can even do
 // direct database queries.
 export async function getStaticProps({ locale }) {  
-  const stories = await storiesFetcher(locale, 10, null);
+  const {url, data} = await storiesFetcher(locale, 10);
+
+  console.log(`getStaticProps: ${url(0)}: ${data}`)
 
   // By returning { props: { posts } }, the Blog component
   // will receive `posts` as a prop at build time
   return {
     props: {
       fallback: {
-        '/api/stories?page=0': stories
+        [unstable_serialize(page => url(page))]: data
       }
     },
   }

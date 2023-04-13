@@ -1,27 +1,37 @@
 import axios from 'axios';
-import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { transformLocale } from './utils';
+import { unstable_serialize } from "swr/infinite";
 
-export function useStories(pageIndex, locale, pageSize, lastKey) {
-    const fetcher = async () => storiesFetcher(locale, pageSize, lastKey);
 
-    const { data, error, isLoading } = useSWR(`/api/stories?page=${pageIndex}`, fetcher, {refreshInterval: 0, revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false})
+const getKey = (pageIndex, locale, pageSize, previousPageData) => {
+    console.log(`getKey: ${pageIndex}, ${locale}, ${pageSize}, ${previousPageData}`);
+
+    const language = transformLocale(locale);
+    if (previousPageData && !previousPageData.Page.HasMore) return null; // reached the end
+    // first page, we don't have `previousPageData`
+    if (pageIndex === 0) return `https://lwtmylvikd.execute-api.us-east-1.amazonaws.com/Development/api/stories?language=${language}&pageSize=${pageSize}`
+
+    // add the cursor to the API endpoint
+    return `https://lwtmylvikd.execute-api.us-east-1.amazonaws.com/Development/api/stories?language=${language}&pageSize=${pageSize}&lastKey=${previousPageData.Page.LastEvaluatedKey}`
+}
+
+export function useStories(locale, pageSize) {
+    const fetcher = (url) => axios.get(url).then(res => res.data);
+
+    const { data, mutate, size, setSize, isValidating, isLoading} = useSWRInfinite((pageIndex, previousPageData) => {return getKey(pageIndex, locale, pageSize, previousPageData)}, fetcher, { initialSize: 1, revalidateFirstPage: false })
 
     return {
-        data: data,
+        data,        
         isLoading,
-        isError: error
+        isValidating,
+        mutate: mutate,
+        size,
+        setSize,
     }
 }
 
-export function storiesFetcher(locale, pageSize, lastKey) {
-    const language = transformLocale(locale);
-    let url = `https://lwtmylvikd.execute-api.us-east-1.amazonaws.com/Development/api/stories?language=${language}&pageSize=${pageSize}`;
-    if (lastKey) {
-        url += `&lastKey=${lastKey}`;
-    }
-
-    console.log(`URL: ${url}`);
-
-    return axios.get(url).then(res => res.data);
+export async function storiesFetcher(locale, pageSize) {
+    const url = getKey(0, locale, pageSize, null)
+    return {url: (page) => getKey(page, locale, pageSize, null) , data: await axios.get(url).then(res => res.data)}
 }
