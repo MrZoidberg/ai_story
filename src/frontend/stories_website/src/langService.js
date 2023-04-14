@@ -3,6 +3,7 @@ export const SUPPORTED_LANGS = ["en", "ru", "ua"];
 
 
 export const setLanguage = (lang) => {
+    console.log(`setLanguage: ${lang}`);
     if (typeof window !== 'undefined') {
         localStorage.setItem('lang', lang);
     }

@@ -5,19 +5,17 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import { useStories } from '../src/api';
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react';
-import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+//import { useSWRConfig } from 'swr';
 
 const PAGE_SIZE = 10;
 
 // create MUI Grid with up to 2 columns from stories data 
 function StoriesGrid({locale}) {
-    const { data, isLoading, isValidating, mutate, size, setSize } = useStories(locale, PAGE_SIZE);
-    // console.log(`StoriesGrid size: ${size}`);
-    // console.log(`isLoading: ${isLoading}`);
-    // console.log(`StoriesGrid data:`, data);
+    const { data, isLoading, isValidating, mutate, size, setSize } = useStories(locale, PAGE_SIZE);        
+
+    //const { cache } = useSWRConfig();
+    //console.log(`SWR cache:`, [...cache.entries()]);
 
     const stories = data ? [].concat(Array.isArray(data) ? data.map(p => p["Page"]["Stories"]).flat(1): data["Page"]["Stories"]) : [];
     const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");

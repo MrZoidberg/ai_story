@@ -24,13 +24,6 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: roboto.style.fontFamily,
-  },
-  overrides: {
-    MuiButton: {
-      label: {
-        color: blue[500],
-      },
-    }
   }
 });
 
