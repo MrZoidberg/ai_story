@@ -122,7 +122,7 @@ public class Function
             return new APIGatewayHttpApiV2ProxyResponse()
             {
                 StatusCode = 200,
-                Body = JsonSerializer.Serialize(new GetStoriesResponse(page), jso),
+                Body = JsonSerializer.Serialize(new GetStoriesResponse(page, request.Language!), jso),
                 Headers = new Dictionary<string, string>
                 {
                     { "Content-Type", "application/json" },

@@ -29,3 +29,12 @@
     display: flex;
     width: 100%;
 }
+
+.tag {
+    margin: 0 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    color: #0e1cb5;
+    text-decoration: none;
+}

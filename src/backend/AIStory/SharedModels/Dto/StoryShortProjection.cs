@@ -28,6 +28,10 @@ public class StoryShortProjection
     public IEnumerable<string> Prompt { get; set; }
 
     public string Language { get; set; }
+
+    public string? Title { get; set; }
+
+    public IEnumerable<string>? HashTags { get; set; }        
 }
 
 public static class StoryShortProjectionExtensions
@@ -41,6 +45,8 @@ public static class StoryShortProjectionExtensions
             Story = string.Join(Environment.NewLine, item["Story"].M.ToDictionary(k => int.Parse(k.Key), v => v.Value.S).Select(x => x.Value)),
             Prompt = item["Prompt"].SS,
             Language = item["Language"].S,
+            Title = item.ContainsKey("Title") ? item["Title"].S : null,
+            HashTags = item.ContainsKey("HashTags") ? item["HashTags"].SS : null,
         };
     }
 }

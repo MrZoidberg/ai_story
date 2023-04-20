@@ -21,6 +21,8 @@ public class Story
     public int CompletionTokens { get; set; }
     public bool IsSentToChat { get; set; }
     public string? Error { get; set; }
+    public IEnumerable<string>? HashTags { get; set; }
+    public string? Title { get; set; }
 }
 
 public static class StoryExtensions
@@ -56,6 +58,16 @@ public static class StoryExtensions
             dict.Add("Error", new AttributeValue { S = story.Error });
         }
 
+        if (story.HashTags != null)
+        {
+            dict.Add("HashTags", new AttributeValue { SS = story.HashTags.ToList() });
+        }
+
+        if (!string.IsNullOrEmpty(story.Title))
+        {
+            dict.Add("Title", new AttributeValue { S = story.Title });
+        }
+
         return dict;
     }
 
@@ -78,7 +90,9 @@ public static class StoryExtensions
             Model = item["Model"].S,
             CompletionTokens = int.Parse(item["CompletionTokens"].N),
             IsSentToChat = item.ContainsKey("IsSentToChat") ? item["IsSentToChat"].BOOL : false,
-            Error = item.ContainsKey("Error") ? item["Error"].S : null
+            Error = item.ContainsKey("Error") ? item["Error"].S : null,
+            HashTags = item.ContainsKey("HashTags") ? item["HashTags"].SS : null,
+            Title = item.ContainsKey("Title") ? item["Title"].S : null
         };
     }
 }

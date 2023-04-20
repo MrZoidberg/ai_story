@@ -135,6 +135,8 @@ public partial class LambdaFunctionJsonSerializerContext : JsonSerializerContext
 [JsonSerializable(typeof(ChatRequest))]
 [JsonSerializable(typeof(ChatMessage))]
 [JsonSerializable(typeof(ChatMessageRole))]
+[JsonSerializable(typeof(ChatResponseModel))]
+[JsonSerializable(typeof(ChatResponseModel2))]
 public partial class MessageJsonSerializerContext : JsonSerializerContext
 {
     // By using this partial class derived from JsonSerializerContext, we can generate reflection free JSON Serializer code at compile time

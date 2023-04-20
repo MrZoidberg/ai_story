@@ -37,11 +37,18 @@ function StoriesGrid({locale}) {
 
                             </CardActions>
                             <CardContent>
-                                {/* <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {story["StoryId"]}
-                                </Typography> */}
+                                { story["Title"] &&
+                                <Typography variant="h6" align="center" gutterBottom>
+                                    {story["Title"]}
+                                </Typography>                                
+                                }           
                                 <Typography variant="body1" className={styles.storyText} display="block">
                                     {story["Story"]}
+                                </Typography>
+                                <Typography variant="overline" color="text.secondary" display="block">
+                                    {story["HashTags"] && story["HashTags"].map((tag) => (
+                                        <span key={tag} className={styles.tag}>{tag}</span>
+                                    ))}
                                 </Typography>
                             </CardContent>
                         </Card>

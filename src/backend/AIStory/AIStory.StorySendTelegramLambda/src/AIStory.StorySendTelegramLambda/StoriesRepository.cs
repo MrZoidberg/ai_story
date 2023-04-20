@@ -17,6 +17,20 @@ internal class StoriesRepository
         this.amazonDynamoDB = amazonDynamoDB;
         TableName = lambdaOptions.StoriesTableName ?? "Stories";
     }
+    
+    public async Task<Story> GetStory(string storyId)
+    {
+        var request = new GetItemRequest
+        {
+            TableName = TableName,
+            Key = new Dictionary<string, AttributeValue>
+            {
+                { "StoryId", new AttributeValue { S = storyId } },
+            },
+        };
+        var response = await amazonDynamoDB.GetItemAsync(request);
+        return response.Item.ToStory();
+    }
 
     public async Task UpdateIsSentToChat(Story story)
     {

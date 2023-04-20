@@ -52,10 +52,56 @@ internal sealed class MessageProcessor
         {
             ChatResult result = await openAIAPI.Chat.CreateChatCompletionAsync(request);
 
+            string text = string.Join("", result.Choices.Select(choice => choice.Message.Content));
+            logger.LogInformation($"{generateStoryMessage.Id}: OpenAPI returned response {result.RequestId} in {result.ProcessingTime.TotalSeconds}s. Text: {text}");
+            //now we need to find and extract JSON {} inside text
+            int start = text.IndexOf('{');
+            int end = text.LastIndexOf('}') + 1;
+            string json = text.Substring(start, end - start);
+            logger.LogInformation($"Extracted json: {json}");
+
+            string? storyText;
+            string? storyTitle;
+            IEnumerable<string>? hashTags;
+            try
+            {
+                ChatResponseModel openAIResponse = JsonSerializer.Deserialize<ChatResponseModel>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    TypeInfoResolver = MessageJsonSerializerContext.Default
+                });
+                storyText = openAIResponse.Text;
+                hashTags = openAIResponse.HashTags;
+                storyTitle = openAIResponse.Title;
+            }
+            catch (JsonException ex)
+            {
+                logger.LogInformation($"Error deserializing json: {ex.Message}");
+                try
+                {
+                    ChatResponseModel2 openAIResponse = JsonSerializer.Deserialize<ChatResponseModel2>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        TypeInfoResolver = MessageJsonSerializerContext.Default
+                    });
+                    storyText = openAIResponse.Text;
+                    storyTitle = openAIResponse.Title;
+                    hashTags = new List<string>(new[] { openAIResponse.HashTags });
+                }
+                catch (JsonException exx)
+                {
+                    logger.LogInformation($"Error deserializing json: {exx.Message}");
+
+                    throw exx;
+                }
+            }
+
+
+
             Story story = new Story()
             {
                 StoryId = generateStoryMessage.Id,
-                StoryText = result.Choices.ToDictionary(k => k.Index, v => v.Message.Content),
+                StoryText = new Dictionary<int, string>() { { 0, storyText}},
                 ProcessingTime = result.ProcessingTime,
                 CreatedAt = DateTime.UtcNow,
                 Prompt = request.Messages.Select(m => m.Content).ToList(),
@@ -67,7 +113,9 @@ internal sealed class MessageProcessor
                 GenerateAudio = generateStoryMessage.GenerateAudio,
                 StoryLength = generateStoryMessage.StoryLength,
                 Model = generateStoryMessage.Model,
-                CompletionTokens = result.Usage.CompletionTokens
+                CompletionTokens = result.Usage.CompletionTokens,
+                Title = storyTitle,
+                HashTags = hashTags,
             };
 
             await storiesRepository.PutStory(story);
