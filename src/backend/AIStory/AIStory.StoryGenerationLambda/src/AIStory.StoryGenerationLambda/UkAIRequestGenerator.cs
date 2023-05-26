@@ -16,7 +16,7 @@ internal sealed class UkAIRequestGenerator : AIRequestGenerator
     protected override string GetSystemPrompt(bool generateAudio)
     {
         string audioPart = generateAudio ? " Використовуйте Speech Synthesis Markup Language для розміщення інтонації в тексті." : string.Empty;
-        string prompt = "Віддай відповідь у вигляді JSON з полями text, hashtags, title.\r\nПриклад:\r\n{\r\n\"text\": \"Here goes story text\",\r\n\"title\": \"Story title\",\r\n\"hashTags\": [\"#FirstTag\", \"#SecondTag\"]\r\n}\r\n" + audioPart;
+        string prompt = "Віддай відповідь лише у вигляді JSON з полями text, hashtags, title.\r\nПриклад:\r\n{\r\n\"text\": \"Here goes story text\",\r\n\"title\": \"Story title\",\r\n\"hashTags\": [\"#FirstTag\", \"#SecondTag\"]\r\n}\r\n" + audioPart;
         return prompt;
     }
 

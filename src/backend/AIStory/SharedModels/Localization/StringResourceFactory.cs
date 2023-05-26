@@ -80,6 +80,8 @@ public interface IStringResources
     public string StoryBeingGeneratedFormat { get; set; }
 
     public string HereIsStoryFormat { get; set; }
+
+    public string StoryGenerationError { get; set; }
 }
 
 internal class RuStringResources : IStringResources
@@ -136,6 +138,8 @@ internal class RuStringResources : IStringResources
     public string StoryBeingGeneratedFormat { get; set; } = "Я добавил вашу историю к себе в очередь под номером {0}. История будет готова примерно через {1} секунд. Мой искусственный разум уже думает над ней...";
 
     public string HereIsStoryFormat { get; set; } = "Вот ваша история:\n\n{0}\n\nСделано с помощью https://t.me/AIGPTStoriesBot\nhttps://robostoryz.com";
+
+    public string StoryGenerationError { get; set; } = "Произошла ошибка при генерации истории. Попробуйте еще раз.";
 }
 
 internal class UaStringResources : IStringResources
@@ -192,6 +196,8 @@ internal class UaStringResources : IStringResources
     public string StoryBeingGeneratedFormat { get; set; } = "Я додав історію до себе в чергу під номером {0}. Історія буде готова приблизно через {1} секунд. Мій штучний розум уже думає над нею...";
 
     public string HereIsStoryFormat { get; set; } = "Ось ваша історія:\n\n{0}\n\nЗроблено за допомогою https://t.me/AIGPTStoriesBot\nhttps://robostoryz.com";
+
+    public string StoryGenerationError { get; set; } = "Сталася помилка при генерації історії. Спробуйте ще раз.";
 }
 
 internal class EngStringResources : IStringResources
@@ -248,4 +254,6 @@ internal class EngStringResources : IStringResources
     public string StoryBeingGeneratedFormat { get; set; } = "I added your story to my queue under number {0}. The story will be ready in about {1} seconds. My AI mind is already thinking about it...";
 
     public string HereIsStoryFormat { get; set; } = "Here is your story:\n\n{0}\n\nMade with https://t.me/AIGPTStoriesBot.\nhttps://robostoryz.com";
+
+    public string StoryGenerationError { get; set; } = "An error occurred while generating the story. Try again.";
 }

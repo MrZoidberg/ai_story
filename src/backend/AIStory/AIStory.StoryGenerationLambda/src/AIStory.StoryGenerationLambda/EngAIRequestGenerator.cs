@@ -14,7 +14,7 @@ internal sealed class EngAIRequestGenerator : AIRequestGenerator
     protected override string GetSystemPrompt(bool generateAudio)
     {
         string audioPart = generateAudio ? " Use the Speech Synthesis Markup Language to set intonation in text." : string.Empty;
-        string prompt = "Give the response as JSON with text, hashtags, title fields. \r\nExample:\r\n{\r\n\"text\": \"Here goes story text\",\r\n\"title\": \"Story title\",\r\n\"hashTags\": [\"#FirstTag\", \"#SecondTag\"]\r\n}\r\n" + audioPart;
+        string prompt = "You must give the response only in JSON  format with text, hashtags, and title fields. \r\nExample:\r\n{\r\n\"text\": \"Here goes story text\",\r\n\"title\": \"Story title\",\r\n\"hashTags\": [\"#FirstTag\", \"#SecondTag\"]\r\n}\r\n" + audioPart;
         return prompt;
     }
 

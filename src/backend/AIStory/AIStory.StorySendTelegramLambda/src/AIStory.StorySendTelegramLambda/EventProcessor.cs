@@ -35,28 +35,31 @@ internal sealed class EventProcessor
         }
         lambdaLogger.LogInformation($"Processing story {story.StoryId} for chat {story.ChatId}");
 
+        stringResourceFactory.Language = story.Language;
+
         if (story.StoryText == null || story.StoryText.Count == 0)
         {
             lambdaLogger.LogError($"Processing story {story.StoryId} failed because story text is absent");
+
+            await telegramBotClient.SendTextMessageAsync(new ChatId(story.ChatId), stringResourceFactory.StringResources.StoryGenerationError);
         }
-
-        stringResourceFactory.Language = story.Language;
-
-        StringBuilder sb = new StringBuilder();
-        if (!string.IsNullOrEmpty(story.Title))
+        else
         {
-            sb.AppendLine(story.Title);
-            sb.AppendLine();
-        }
-        sb.AppendLine(string.Join(Environment.NewLine, story.StoryText!.Select(x => x.Value)));
-        if (story.HashTags != null && story.HashTags.Count() > 0)
-        {
-            sb.AppendLine(string.Join(' ', story.HashTags.Select(h => h.StartsWith('#') ? h : "#" + h)));
-        }
+            StringBuilder sb = new StringBuilder();
+            if (!string.IsNullOrEmpty(story.Title))
+            {
+                sb.AppendLine(story.Title);
+                sb.AppendLine();
+            }
+            sb.AppendLine(string.Join(Environment.NewLine, story.StoryText!.Select(x => x.Value)));
+            if (story.HashTags != null && story.HashTags.Count() > 0)
+            {
+                sb.AppendLine(string.Join(' ', story.HashTags.Select(h => h.StartsWith('#') ? h : "#" + h)));
+            }
 
-        var text = string.Format(stringResourceFactory.StringResources.HereIsStoryFormat, sb.ToString());
-        await telegramBotClient.SendTextMessageAsync(new ChatId(story.ChatId), text);
-
+            var text = string.Format(stringResourceFactory.StringResources.HereIsStoryFormat, sb.ToString());
+            await telegramBotClient.SendTextMessageAsync(new ChatId(story.ChatId), text);
+        }
         story.IsSentToChat = true;
         await storiesRepository.UpdateIsSentToChat(story);
     }

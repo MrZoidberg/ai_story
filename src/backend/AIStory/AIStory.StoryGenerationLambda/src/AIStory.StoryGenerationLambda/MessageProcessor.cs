@@ -144,7 +144,7 @@ internal sealed class MessageProcessor
 
             await storiesRepository.PutStory(story);
 
-            logger.LogInformation($"{generateStoryMessage.Id}: OpenAPI failed with error {ex.GetType().FullName}. Message: {ex.Message}");
+            logger.LogError($"{generateStoryMessage.Id}: OpenAPI failed with error {ex.GetType().FullName}. Message: {ex.Message}. Stacktrace: {ex.StackTrace}");
         }
     }
 }
